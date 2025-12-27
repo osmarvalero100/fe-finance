@@ -67,6 +67,9 @@
                 Categoría
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Etiquetas
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Monto
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -87,6 +90,18 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ expense.category?.name || 'Sin categoría' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex gap-1">
+                  <span
+                    v-for="tag in expense.tags"
+                    :key="tag.id"
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                    :style="{ backgroundColor: tag.color + '20', color: tag.color }"
+                  >
+                    {{ tag.icon }} {{ tag.name }}
+                  </span>
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 ${{ expense.amount }}
@@ -182,6 +197,22 @@
                 </option>
               </select>
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Etiquetas</label>
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <div v-for="tag in tags" :key="tag.id" class="flex items-center">
+                  <input
+                    type="checkbox"
+                    :value="tag.id"
+                    v-model="expenseForm.tag_ids"
+                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label class="ml-2 block text-sm text-gray-900" :style="{ color: tag.color }">
+                    {{ tag.icon }} {{ tag.name }}
+                  </label>
+                </div>
+              </div>
+            </div>
             <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
@@ -209,12 +240,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiService from '@/services/api'
-import type { ExpenseResponse, ExpenseCreate, ExpenseUpdate, CategoryResponse, PaymentMethodResponse } from '@/types/api'
+import type { ExpenseResponse, ExpenseCreate, ExpenseUpdate, CategoryResponse, PaymentMethodResponse, TagResponse } from '@/types/api'
 
 const expenses = ref<ExpenseResponse[]>([])
 const categories = ref<CategoryResponse[]>([])
 const expenseCategories = ref<CategoryResponse[]>([])
 const paymentMethods = ref<PaymentMethodResponse[]>([])
+const tags = ref<TagResponse[]>([])
 const loading = ref(true)
 const saving = ref(false)
 const showAddModal = ref(false)
@@ -275,6 +307,15 @@ const fetchPaymentMethods = async () => {
   }
 }
 
+const fetchTags = async () => {
+  try {
+    const response = await apiService.instance.get('/tags/')
+    tags.value = response.data
+  } catch (error) {
+    console.error('Error fetching tags:', error)
+  }
+}
+
 const saveExpense = async () => {
   try {
     saving.value = true
@@ -307,7 +348,7 @@ const editExpense = (expense: ExpenseResponse) => {
     payment_method_id: expense.payment_method_id || undefined,
     is_recurring: expense.is_recurring || false,
     recurring_frequency: expense.recurring_frequency || undefined,
-    tag_ids: expense.tag_ids || [],
+    tag_ids: expense.tags?.map(t => t.id) || expense.tag_ids || [],
     notes: expense.notes || undefined
   }
   showEditModal.value = true
@@ -349,5 +390,6 @@ onMounted(() => {
   fetchExpenses()
   fetchCategories()
   fetchPaymentMethods()
+  fetchTags()
 })
 </script>
