@@ -191,12 +191,14 @@
               <label class="block text-sm font-medium text-gray-700">Método de Pago</label>
               <select
                 v-model="expenseForm.payment_method_id"
+                @change="watchPaymentMethodSelection"
                 class="mt-1 block w-full px-4 py-3 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:shadow-md"
               >
                 <option value="">Seleccionar método</option>
                 <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
                   {{ method.name }}
                 </option>
+                <option value="new" class="font-bold text-indigo-600">+ Crear nuevo método</option>
               </select>
             </div>
             <div>
@@ -293,6 +295,101 @@
         </div>
       </div>
     </div>
+
+    <!-- Quick Payment Method Modal -->
+    <div
+      v-if="showPaymentMethodModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60]"
+      @click="closePaymentMethodModal"
+    >
+      <div class="relative top-20 mx-auto p-5 border w-80 shadow-lg rounded-md bg-white" @click.stop>
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Nuevo Método de Pago</h3>
+          <form @submit.prevent="savePaymentMethod" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Nombre *</label>
+              <input
+                v-model="paymentMethodForm.name"
+                type="text"
+                required
+                class="mt-1 block w-full px-3 py-2 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Tipo *</label>
+                <select 
+                  v-model="paymentMethodForm.payment_type"
+                  required
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option value="Cash">Efectivo</option>
+                  <option value="Debit Card">Tarjeta de Débito</option>
+                  <option value="Credit Card">Tarjeta de Crédito</option>
+                  <option value="Bank Account">Cuenta Bancaria</option>
+                  <option value="Digital Wallet">Billetera Digital</option>
+                  <option value="Other">Otro</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Institución</label>
+                <input
+                  v-model="paymentMethodForm.institution"
+                  type="text"
+                  placeholder="Banco..."
+                  class="mt-1 block w-full px-3 py-2 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Número de Cuenta (4 dígs)</label>
+              <input
+                v-model="paymentMethodForm.account_number"
+                type="text"
+                maxlength="4"
+                placeholder="1234"
+                class="mt-1 block w-full px-3 py-2 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Color</label>
+                <input
+                  v-model="paymentMethodForm.color"
+                  type="color"
+                  class="mt-1 block w-full h-10 p-1 rounded-md border border-gray-200"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Icono</label>
+                <input
+                  v-model="paymentMethodForm.icon"
+                  type="text"
+                  placeholder="💳"
+                  class="mt-1 block w-full px-3 py-2 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                @click="closePaymentMethodModal"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                :disabled="savingPaymentMethod"
+                class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {{ savingPaymentMethod ? 'Guardando...' : 'Crear' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -311,7 +408,9 @@ const saving = ref(false)
 const showAddModal = ref(false)
 const showEditModal = ref(false)
 const showCategoryModal = ref(false)
+const showPaymentMethodModal = ref(false)
 const savingCategory = ref(false)
+const savingPaymentMethod = ref(false)
 const editingExpense = ref<ExpenseResponse | null>(null)
 
 const categoryForm = ref({
@@ -319,6 +418,15 @@ const categoryForm = ref({
   icon: '',
   color: '#6366f1',
   category_type: 'expense'
+})
+
+const paymentMethodForm = ref({
+  name: '',
+  institution: '',
+  account_number: '',
+  payment_type: 'Debit Card',
+  color: '#3b82f6',
+  icon: '💳'
 })
 
 const filters = ref({
@@ -343,6 +451,13 @@ const watchCategorySelection = () => {
   if (expenseForm.value.category_id === 'new' as any) {
     expenseForm.value.category_id = 0
     showCategoryModal.value = true
+  }
+}
+
+const watchPaymentMethodSelection = () => {
+  if (expenseForm.value.payment_method_id === 'new' as any) {
+    expenseForm.value.payment_method_id = undefined
+    showPaymentMethodModal.value = true
   }
 }
 
@@ -487,6 +602,37 @@ const closeCategoryModal = () => {
     icon: '',
     color: '#6366f1',
     category_type: 'expense'
+  }
+}
+
+const savePaymentMethod = async () => {
+  try {
+    savingPaymentMethod.value = true
+    const response = await apiService.instance.post('/payment-methods/', paymentMethodForm.value)
+    
+    // Refresh methods
+    await fetchPaymentMethods()
+    
+    // Select the new method
+    expenseForm.value.payment_method_id = response.data.id
+    
+    closePaymentMethodModal()
+  } catch (error) {
+    console.error('Error creating payment method:', error)
+  } finally {
+    savingPaymentMethod.value = false
+  }
+}
+
+const closePaymentMethodModal = () => {
+  showPaymentMethodModal.value = false
+  paymentMethodForm.value = {
+    name: '',
+    institution: '',
+    account_number: '',
+    payment_type: 'Debit Card',
+    color: '#3b82f6',
+    icon: '💳'
   }
 }
 
