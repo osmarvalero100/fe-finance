@@ -167,6 +167,7 @@
               <label class="block text-sm font-medium text-gray-700">Categoría</label>
               <select
                 v-model="expenseForm.category_id"
+                @change="watchCategorySelection"
                 required
                 class="mt-1 block w-full px-4 py-3 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:shadow-md"
               >
@@ -174,6 +175,7 @@
                 <option v-for="category in expenseCategories" :key="category.id" :value="category.id">
                   {{ category.name }}
                 </option>
+                <option value="new" class="font-bold text-indigo-600">+ Crear nueva categoría</option>
               </select>
             </div>
             <div>
@@ -234,6 +236,63 @@
         </div>
       </div>
     </div>
+
+    <!-- Quick Category Modal -->
+    <div
+      v-if="showCategoryModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60]"
+      @click="closeCategoryModal"
+    >
+      <div class="relative top-20 mx-auto p-5 border w-80 shadow-lg rounded-md bg-white" @click.stop>
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Nueva Categoría</h3>
+          <form @submit.prevent="saveCategory" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Nombre *</label>
+              <input
+                v-model="categoryForm.name"
+                type="text"
+                required
+                class="mt-1 block w-full px-3 py-2 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Icono / Emoji</label>
+              <input
+                v-model="categoryForm.icon"
+                type="text"
+                placeholder="🛒"
+                class="mt-1 block w-full px-3 py-2 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Color</label>
+              <input
+                v-model="categoryForm.color"
+                type="color"
+                class="mt-1 block w-full h-10 p-1 rounded-md border border-gray-200"
+              />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                @click="closeCategoryModal"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                :disabled="savingCategory"
+                class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {{ savingCategory ? 'Guardando...' : 'Crear' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -251,7 +310,16 @@ const loading = ref(true)
 const saving = ref(false)
 const showAddModal = ref(false)
 const showEditModal = ref(false)
+const showCategoryModal = ref(false)
+const savingCategory = ref(false)
 const editingExpense = ref<ExpenseResponse | null>(null)
+
+const categoryForm = ref({
+  name: '',
+  icon: '',
+  color: '#6366f1',
+  category_type: 'expense'
+})
 
 const filters = ref({
   category_id: '',
@@ -270,6 +338,13 @@ const expenseForm = ref<ExpenseCreate & { id?: number }>({
   tag_ids: [],
   notes: undefined
 })
+
+const watchCategorySelection = () => {
+  if (expenseForm.value.category_id === 'new' as any) {
+    expenseForm.value.category_id = 0
+    showCategoryModal.value = true
+  }
+}
 
 const fetchExpenses = async () => {
   try {
@@ -384,6 +459,35 @@ const closeModal = () => {
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('es-ES')
+}
+
+const saveCategory = async () => {
+  try {
+    savingCategory.value = true
+    const response = await apiService.instance.post('/categories/', categoryForm.value)
+    
+    // Refresh categories
+    await fetchCategories()
+    
+    // Select the new category
+    expenseForm.value.category_id = response.data.id
+    
+    closeCategoryModal()
+  } catch (error) {
+    console.error('Error creating category:', error)
+  } finally {
+    savingCategory.value = false
+  }
+}
+
+const closeCategoryModal = () => {
+  showCategoryModal.value = false
+  categoryForm.value = {
+    name: '',
+    icon: '',
+    color: '#6366f1',
+    category_type: 'expense'
+  }
 }
 
 onMounted(() => {
