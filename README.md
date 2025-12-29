@@ -40,8 +40,8 @@ Este proyecto utiliza variables de entorno para configurar diferentes aspectos d
 | Variable | Descripción | Valor por defecto |
 |----------|-------------|-------------------|
 | `VITE_API_BASE_URL` | URL base de la API | `http://127.0.0.1:8000` |
-| `VITE_APP_NAME` | Nombre de la aplicación | `Finance App` |
-| `VITE_APP_VERSION` | Versión de la aplicación | `1.0.0` |
+| `APP_NAME` | Nombre de la aplicación | `Finance App` |
+| `APP_VERSION` | Versión de la aplicación | `1.0.0` |
 | `VITE_APP_ENV` | Entorno actual | `development` |
 
 #### Configuración por Entorno
@@ -152,7 +152,7 @@ En plataformas de despliegue como Vercel, Netlify, o servidores tradicionales, c
 
 **Ejemplo en Vercel**:
 - Ve a Project Settings > Environment Variables
-- Agrega: `VITE_API_BASE_URL=https://tu-api.com`
+- Agrega: `API_BASE_URL=https://tu-api.com`
 
 ## Desarrollo
 

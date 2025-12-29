@@ -2,13 +2,13 @@
 export const config = {
   // API Configuration
   api: {
-    baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000',
+    baseUrl: import.meta.env.API_BASE_URL || 'http://127.0.0.1:8000',
   },
 
   // Application Configuration
   app: {
-    name: import.meta.env.VITE_APP_NAME || 'Finance App',
-    version: import.meta.env.VITE_APP_VERSION || '1.0.0',
+    name: import.meta.env.APP_NAME || 'Finance App',
+    version: import.meta.env.APP_VERSION || '1.0.0',
     env: import.meta.env.VITE_APP_ENV || 'development',
   },
 
@@ -21,7 +21,7 @@ export const config = {
 
 // Type-safe environment validation
 export const validateConfig = () => {
-  const requiredVars = ['VITE_API_BASE_URL']
+  const requiredVars = ['API_BASE_URL']
 
   const missing = requiredVars.filter(varName => !import.meta.env[varName])
 
@@ -36,7 +36,7 @@ export const validateConfig = () => {
   try {
     new URL(config.api.baseUrl)
   } catch {
-    throw new Error(`VITE_API_BASE_URL must be a valid URL: ${config.api.baseUrl}`)
+    throw new Error(`API_BASE_URL must be a valid URL: ${config.api.baseUrl}`)
   }
 }
 
