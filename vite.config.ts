@@ -10,5 +10,5 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  base: 'https://osmarvalero100.github.io/fe-finance/',
+  base: process.env.NODE_ENV === 'production' ? '/fe-finance/' : '/',
 })
