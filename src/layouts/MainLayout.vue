@@ -1,10 +1,63 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
+
+const isMobileMenuOpen = ref(false)
+
+const pageTitle = computed(() => {
+  const titles: Record<string, string> = {
+    dashboard: 'Dashboard',
+    expenses: 'Gastos',
+    incomes: 'Ingresos',
+    categories: 'Categorías',
+    tags: 'Etiquetas',
+    'payment-methods': 'Métodos de Pago',
+    investments: 'Inversiones',
+    'financial-products': 'Productos Financieros',
+    debts: 'Deudas',
+    budgets: 'Presupuestos'
+  }
+  return titles[route.name as string] || 'Finanzas Personales'
+})
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
+
+// Close mobile menu when navigating
+router.afterEach(() => {
+  isMobileMenuOpen.value = false
+})
+</script>
+
 <template>
-  <div class="min-h-screen bg-gray-100 flex">
-    <!-- Sidebar -->
-    <div class="hidden lg:flex lg:flex-shrink-0">
-      <div class="flex flex-col w-64 bg-white shadow-lg">
-        <div class="flex items-center justify-center h-16 bg-indigo-600">
+  <div class="min-h-screen bg-gray-100 flex flex-col lg:flex-row" :class="{ 'overflow-hidden': isMobileMenuOpen }">
+    <!-- Mobile Sidebar Backdrop -->
+    <div 
+      v-if="isMobileMenuOpen" 
+      class="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden transition-opacity"
+      @click="isMobileMenuOpen = false"
+    ></div>
+
+    <!-- Sidebar (Mobile & Desktop) -->
+    <div 
+      class="fixed inset-y-0 left-0 flex-shrink-0 w-64 bg-white shadow-lg transform ease-in-out duration-300 z-50 lg:relative lg:translate-x-0"
+      :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+    >
+      <div class="flex flex-col h-full">
+        <div class="flex items-center justify-between h-16 px-4 bg-indigo-600 flex-shrink-0">
           <h1 class="text-white text-xl font-bold">Finanzas</h1>
+          <button @click="isMobileMenuOpen = false" class="text-white lg:hidden">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
         <nav class="mt-8 flex-1">
           <router-link
@@ -64,7 +117,7 @@
             :class="{ 'bg-indigo-50 text-indigo-600 border-r-4 border-indigo-600': $route.name === 'payment-methods' }"
           >
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3-3v8a3 3 0 003 3z"></path>
             </svg>
             Métodos de Pago
           </router-link>
@@ -124,10 +177,18 @@
     </div>
 
     <!-- Main content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <header class="bg-white shadow-sm">
-        <div class="px-6 py-4">
-          <h2 class="text-2xl font-semibold text-gray-900">{{ pageTitle }}</h2>
+    <div class="flex-1 flex flex-col overflow-hidden w-full">
+      <header class="bg-white shadow-sm flex items-center justify-between px-4 lg:px-6 h-16 flex-shrink-0">
+        <div class="flex items-center">
+          <button 
+            @click="isMobileMenuOpen = true" 
+            class="text-gray-500 hover:text-indigo-600 focus:outline-none lg:hidden mr-4"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
+          <h2 class="text-xl lg:text-2xl font-semibold text-gray-900">{{ pageTitle }}</h2>
         </div>
       </header>
       <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -137,33 +198,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
-
-const pageTitle = computed(() => {
-  const titles: Record<string, string> = {
-    dashboard: 'Dashboard',
-    expenses: 'Gastos',
-    incomes: 'Ingresos',
-    categories: 'Categorías',
-    tags: 'Etiquetas',
-    'payment-methods': 'Métodos de Pago',
-    investments: 'Inversiones',
-    'financial-products': 'Productos Financieros',
-    debts: 'Deudas',
-    budgets: 'Presupuestos'
-  }
-  return titles[route.name as string] || 'Finanzas Personales'
-})
-
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/login')
+<style scoped>
+/* Optional: prevent body scroll when menu is open */
+.overflow-hidden {
+  overflow: hidden;
 }
-</script>
+</style>
