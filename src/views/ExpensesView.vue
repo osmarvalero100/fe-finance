@@ -19,7 +19,7 @@
           <select
             v-model="filters.category_id"
             @change="fetchExpenses"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">Todas las categorías</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -33,7 +33,7 @@
             v-model="filters.date_from"
             @change="fetchExpenses"
             type="date"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
         <div>
@@ -42,7 +42,7 @@
             v-model="filters.date_to"
             @change="fetchExpenses"
             type="date"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       </div>
@@ -466,10 +466,10 @@ const fetchExpenses = async () => {
     loading.value = true
     const params: any = {}
     if (filters.value.category_id) params.category_id = filters.value.category_id
-    if (filters.value.date_from) params.date_from = filters.value.date_from
-    if (filters.value.date_to) params.date_to = filters.value.date_to
+    if (filters.value.date_from) params.start_date = `${filters.value.date_from}T00:00:00`
+    if (filters.value.date_to) params.end_date = `${filters.value.date_to}T23:59:59`
 
-    const response = await apiService.instance.get('/expenses/', { params })
+    const response = await apiService.instance.get('/expenses/filter', { params })
     expenses.value = response.data
   } catch (error) {
     console.error('Error fetching expenses:', error)
