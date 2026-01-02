@@ -3,6 +3,9 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { validateConfig } from './config'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+
+useRegisterSW()
 
 import './style.css'
 
