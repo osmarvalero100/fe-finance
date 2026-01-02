@@ -15,6 +15,9 @@ export default defineConfig({
         short_name: 'Finance',
         description: 'Gestión financiera personal y empresarial',
         theme_color: '#0f172a',
+        background_color: '#0f172a',
+        display: 'standalone',
+        start_url: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
