@@ -18,13 +18,13 @@
 
     <!-- Filters -->
     <div class="bg-white p-4 rounded-lg shadow-sm border">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Categoría</label>
+          <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Categoría</label>
           <select
             v-model="filters.category_id"
             @change="fetchExpenses"
-            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
           >
             <option value="">Todas las categorías</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -33,11 +33,11 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Método de Pago</label>
+          <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Método de Pago</label>
           <select
             v-model="filters.payment_method_id"
             @change="fetchExpenses"
-            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
           >
             <option value="">Todos los métodos</option>
             <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
@@ -46,11 +46,11 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Etiqueta</label>
+          <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Etiqueta</label>
           <select
             v-model="filters.tag_id"
             @change="fetchExpenses"
-            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
           >
             <option value="">Todas las etiquetas</option>
             <option v-for="tag in tags" :key="tag.id" :value="tag.id">
@@ -59,22 +59,30 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Fecha desde</label>
+          <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Fecha desde</label>
           <input
             v-model="filters.date_from"
             @change="fetchExpenses"
             type="date"
-            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Fecha hasta</label>
+          <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Fecha hasta</label>
           <input
             v-model="filters.date_to"
             @change="fetchExpenses"
             type="date"
-            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
           />
+        </div>
+        <div class="flex items-end">
+          <button
+            @click="clearFilters"
+            class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors border border-gray-300 text-sm font-medium h-[42px]"
+          >
+            Limpiar filtros
+          </button>
         </div>
       </div>
     </div>
@@ -467,6 +475,17 @@ const filters = ref({
   date_from: '',
   date_to: ''
 })
+
+const clearFilters = () => {
+  filters.value = {
+    category_id: '',
+    payment_method_id: '',
+    tag_id: '',
+    date_from: '',
+    date_to: ''
+  }
+  fetchExpenses()
+}
 
 const expenseForm = ref<ExpenseCreate & { id?: number }>({
   description: '',
