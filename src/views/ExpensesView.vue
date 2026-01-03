@@ -13,7 +13,7 @@
 
     <!-- Filters -->
     <div class="bg-white p-4 rounded-lg shadow-sm border">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Categoría</label>
           <select
@@ -37,6 +37,19 @@
             <option value="">Todos los métodos</option>
             <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
               {{ method.name }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Etiqueta</label>
+          <select
+            v-model="filters.tag_id"
+            @change="fetchExpenses"
+            class="mt-1 py-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Todas las etiquetas</option>
+            <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+              {{ tag.icon }} {{ tag.name }}
             </option>
           </select>
         </div>
@@ -445,6 +458,7 @@ const paymentMethodForm = ref({
 const filters = ref({
   category_id: '',
   payment_method_id: '',
+  tag_id: '',
   date_from: '',
   date_to: ''
 })
@@ -481,6 +495,7 @@ const fetchExpenses = async () => {
     const params: any = {}
     if (filters.value.category_id) params.category_id = filters.value.category_id
     if (filters.value.payment_method_id) params.payment_method_id = filters.value.payment_method_id
+    if (filters.value.tag_id) params.tag_ids = filters.value.tag_id
     if (filters.value.date_from) params.start_date = `${filters.value.date_from}T00:00:00`
     if (filters.value.date_to) params.end_date = `${filters.value.date_to}T23:59:59`
 
