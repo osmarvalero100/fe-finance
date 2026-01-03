@@ -435,6 +435,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import apiService from '@/services/api'
+import { formatCurrency } from '@/utils/formatters'
 import type { ExpenseResponse, ExpenseCreate, ExpenseUpdate, CategoryResponse, PaymentMethodResponse, TagResponse } from '@/types/api'
 
 const expenses = ref<ExpenseResponse[]>([])
@@ -632,14 +633,6 @@ const closeModal = () => {
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('es-ES')
-}
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0
-  }).format(amount)
 }
 
 const saveCategory = async () => {

@@ -56,11 +56,11 @@
                 {{ investment.broker_platform || '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                ${{ investment.amount_invested.toLocaleString() }}
+                {{ formatCurrency(investment.amount_invested) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <span :class="getValueColor(investment)">
-                  ${{ (investment.current_value || investment.amount_invested).toLocaleString() }}
+                  {{ formatCurrency(investment.current_value || investment.amount_invested) }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -232,6 +232,7 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useInvestmentsStore } from '@/stores/investments'
+import { formatCurrency } from '@/utils/formatters'
 import type { InvestmentResponse, InvestmentCreate } from '@/types/api'
 
 const store = useInvestmentsStore()

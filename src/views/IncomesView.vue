@@ -49,7 +49,7 @@
                 {{ income.source }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                ${{ income.amount }}
+                {{ formatCurrency(income.amount) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(income.date) }}
@@ -150,6 +150,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiService from '@/services/api'
+import { formatCurrency } from '@/utils/formatters'
 import type { IncomeResponse, IncomeCreate } from '@/types/api'
 
 const incomes = ref<IncomeResponse[]>([])

@@ -58,9 +58,9 @@
                 {{ product.account_number ? `****${product.account_number.slice(-4)}` : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <div>${{ (product.balance || 0).toLocaleString() }}</div>
+                <div>{{ formatCurrency(product.balance || 0) }}</div>
                 <div v-if="product.credit_limit" class="text-xs text-gray-500">
-                  Límite: ${{ product.credit_limit.toLocaleString() }}
+                  Límite: {{ formatCurrency(product.credit_limit) }}
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -233,6 +233,7 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFinancialProductsStore } from '@/stores/financialProducts'
+import { formatCurrency } from '@/utils/formatters'
 import type { FinancialProductResponse, FinancialProductCreate } from '@/types/api'
 
 const store = useFinancialProductsStore()

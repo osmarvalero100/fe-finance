@@ -55,7 +55,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-48">
                 <div class="flex flex-col gap-1">
                   <div class="flex justify-between text-xs">
-                    <span>${{ (debt.original_amount - debt.current_balance).toLocaleString() }} pagado</span>
+                    <span>{{ formatCurrency(debt.original_amount - debt.current_balance) }} pagado</span>
                     <span>{{ getProgressPercentage(debt) }}%</span>
                   </div>
                   <div class="w-full bg-gray-200 rounded-full h-2">
@@ -64,15 +64,15 @@
                       :style="{ width: `${getProgressPercentage(debt)}%` }"
                     ></div>
                   </div>
-                  <div class="text-xs text-gray-400">Total: ${{ debt.original_amount.toLocaleString() }}</div>
+                  <div class="text-xs text-gray-400">Total: {{ formatCurrency(debt.original_amount) }}</div>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                ${{ debt.current_balance.toLocaleString() }}
+                {{ formatCurrency(debt.current_balance) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <div>{{ debt.interest_rate }}% Int.</div>
-                <div class="text-xs text-gray-400">Min: ${{ debt.minimum_payment.toLocaleString() }}</div>
+                <div class="text-xs text-gray-400">Min: {{ formatCurrency(debt.minimum_payment) }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
@@ -259,6 +259,7 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDebtsStore } from '@/stores/debts'
+import { formatCurrency } from '@/utils/formatters'
 import type { DebtResponse, DebtCreate } from '@/types/api'
 
 const store = useDebtsStore()

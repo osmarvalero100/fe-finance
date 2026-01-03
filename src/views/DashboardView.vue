@@ -11,7 +11,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Total Gastos</p>
-            <p class="text-2xl font-semibold text-gray-900">${{ totalExpenses }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(totalExpenses) }}</p>
           </div>
         </div>
       </div>
@@ -25,7 +25,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Total Ingresos</p>
-            <p class="text-2xl font-semibold text-gray-900">${{ totalIncomes }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(totalIncomes) }}</p>
           </div>
         </div>
       </div>
@@ -39,7 +39,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Balance</p>
-            <p class="text-2xl font-semibold text-gray-900">${{ balance }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(balance) }}</p>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@
                   transaction.type === 'expense' ? 'text-red-600' : 'text-green-600'
                 ]"
               >
-                {{ transaction.type === 'expense' ? '-' : '+' }}${{ transaction.amount }}
+                {{ transaction.type === 'expense' ? '-' : '+' }}{{ formatCurrency(transaction.amount) }}
               </p>
               <p class="text-sm text-gray-500">{{ formatDate(transaction.date) }}</p>
             </div>
@@ -133,15 +133,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiService from '@/services/api'
+import { formatCurrency } from '@/utils/formatters'
 import type { ExpenseResponse, IncomeResponse } from '@/types/api'
 
 interface Transaction extends ExpenseResponse {
   type: 'expense' | 'income'
 }
 
-const totalExpenses = ref('0.00')
-const totalIncomes = ref('0.00')
-const balance = ref('0.00')
+const totalExpenses = ref(0)
+const totalIncomes = ref(0)
+const balance = ref(0)
 const activeBudgets = ref(0)
 const recentTransactions = ref<Transaction[]>([])
 const loading = ref(true)
@@ -174,9 +175,9 @@ const fetchDashboardData = async () => {
     const totalExp = expenses.reduce((sum, exp) => sum + exp.amount, 0)
     const totalInc = incomes.reduce((sum, inc) => sum + inc.amount, 0)
 
-    totalExpenses.value = totalExp.toFixed(2)
-    totalIncomes.value = totalInc.toFixed(2)
-    balance.value = (totalInc - totalExp).toFixed(2)
+    totalExpenses.value = totalExp
+    totalIncomes.value = totalInc
+    balance.value = totalInc - totalExp
 
     // Fetch budgets count
     const budgetsResponse = await apiService.instance.get('/budgets/', {

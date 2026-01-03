@@ -67,10 +67,10 @@
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                ${{ parseFloat(budget.total_budgeted).toLocaleString() }}
+                {{ formatCurrency(budget.total_budgeted) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                ${{ parseFloat(budget.total_spent).toLocaleString() }}
+                {{ formatCurrency(budget.total_spent) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
@@ -207,7 +207,7 @@
               </div>
               
               <div class="mt-4 text-right text-sm font-medium text-gray-900 border-t pt-2">
-                Total Presupuestado: ${{ totalBudgeted.toLocaleString() }}
+                Total Presupuestado: {{ formatCurrency(totalBudgeted) }}
               </div>
             </div>
 
@@ -240,6 +240,7 @@ import { ref, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useBudgetsStore } from '@/stores/budgets'
 import { useCategoriesStore } from '@/stores/categories'
+import { formatCurrency } from '@/utils/formatters'
 import type { BudgetResponse, BudgetCreate, BudgetItemCreate } from '@/types/api'
 import apiService from '@/services/api' // Keeping direct dependency minimal if possible, but store handles logic
 
