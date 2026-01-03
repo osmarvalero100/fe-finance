@@ -2,7 +2,12 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex justify-between items-center">
-      <h3 class="text-lg font-medium text-gray-900">Gastos</h3>
+      <div class="flex items-center gap-4">
+        <h3 class="text-lg font-medium text-gray-900">Gastos</h3>
+        <div v-if="!loading" class="bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+          <span class="text-sm font-semibold text-indigo-700">Total: ${{ totalExpenses.toFixed(2) }}</span>
+        </div>
+      </div>
       <button
         @click="showAddModal = true"
         class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -420,7 +425,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import apiService from '@/services/api'
 import type { ExpenseResponse, ExpenseCreate, ExpenseUpdate, CategoryResponse, PaymentMethodResponse, TagResponse } from '@/types/api'
 
@@ -473,6 +478,10 @@ const expenseForm = ref<ExpenseCreate & { id?: number }>({
   recurring_frequency: undefined,
   tag_ids: [],
   notes: undefined
+})
+
+const totalExpenses = computed(() => {
+  return expenses.value.reduce((total, expense) => total + Number(expense.amount), 0)
 })
 
 const watchCategorySelection = () => {
