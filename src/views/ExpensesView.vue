@@ -5,7 +5,7 @@
       <div class="flex items-center gap-4">
         <h3 class="text-lg font-medium text-gray-900">Gastos</h3>
         <div v-if="!loading" class="bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
-          <span class="text-sm font-semibold text-indigo-700">Total: ${{ totalExpenses.toFixed(2) }}</span>
+          <span class="text-sm font-semibold text-indigo-700">Total: {{ formatCurrency(totalExpenses) }}</span>
         </div>
       </div>
       <button
@@ -135,7 +135,7 @@
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                ${{ expense.amount }}
+                {{ formatCurrency(expense.amount) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(expense.date) }}
@@ -613,6 +613,14 @@ const closeModal = () => {
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('es-ES')
+}
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0
+  }).format(amount)
 }
 
 const saveCategory = async () => {
