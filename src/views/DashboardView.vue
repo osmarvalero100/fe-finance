@@ -109,7 +109,7 @@
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-900">{{ transaction.description }}</p>
-                <p class="text-sm text-gray-500">{{ transaction.category?.name || 'Sin categoría' }}</p>
+                <p class="text-sm text-gray-500">{{ transaction.category_name || 'Sin categoría' }}</p>
               </div>
             </div>
             <div class="text-right">
@@ -136,8 +136,13 @@ import apiService from '@/services/api'
 import { formatCurrency } from '@/utils/formatters'
 import type { ExpenseResponse, IncomeResponse } from '@/types/api'
 
-interface Transaction extends ExpenseResponse {
+interface Transaction {
+  id: number
+  amount: number
+  description: string
+  date: string
   type: 'expense' | 'income'
+  category_name?: string
 }
 
 const totalExpenses = ref(0)
@@ -151,39 +156,15 @@ const fetchDashboardData = async () => {
   try {
     loading.value = true
 
-    // Fetch recent expenses
-    const expensesResponse = await apiService.instance.get('/expenses/', {
-      params: { limit: 5, skip: 0 }
-    })
-    const expenses: ExpenseResponse[] = expensesResponse.data
+    // Fetch dashboard summary from the new efficient endpoint
+    const response = await apiService.instance.get('/dashboard/summary')
+    const data = response.data
 
-    // Fetch recent incomes
-    const incomesResponse = await apiService.instance.get('/incomes/', {
-      params: { limit: 5, skip: 0 }
-    })
-    const incomes: IncomeResponse[] = incomesResponse.data
-
-    // Combine and sort by date
-    const transactions: Transaction[] = [
-      ...expenses.map(exp => ({ ...exp, type: 'expense' as const })),
-      ...incomes.map(inc => ({ ...inc, type: 'income' as const }))
-    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10)
-
-    recentTransactions.value = transactions
-
-    // Calculate totals (simplified - in real app, you'd fetch summaries from API)
-    const totalExp = expenses.reduce((sum, exp) => sum + exp.amount, 0)
-    const totalInc = incomes.reduce((sum, inc) => sum + inc.amount, 0)
-
-    totalExpenses.value = totalExp
-    totalIncomes.value = totalInc
-    balance.value = totalInc - totalExp
-
-    // Fetch budgets count
-    const budgetsResponse = await apiService.instance.get('/budgets/', {
-      params: { is_active: true }
-    })
-    activeBudgets.value = budgetsResponse.data.length
+    totalExpenses.value = data.total_expenses
+    totalIncomes.value = data.total_incomes
+    balance.value = data.balance
+    activeBudgets.value = data.active_budgets_count
+    recentTransactions.value = data.recent_transactions
 
   } catch (error) {
     console.error('Error fetching dashboard data:', error)
