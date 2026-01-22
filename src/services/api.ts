@@ -5,7 +5,7 @@ import type { Token } from '@/types/api'
 const API_BASE_URL = config.api.baseUrl
 
 class ApiService {
-  private api: AxiosInstance
+  private unauthorizedCallback: (() => void) | null = null
 
   constructor() {
     this.api = axios.create({
@@ -36,11 +36,17 @@ class ApiService {
         if (error.response?.status === 401) {
           // Token expired or invalid
           this.logout()
-          // Redirect to login or emit event
+          if (this.unauthorizedCallback) {
+            this.unauthorizedCallback()
+          }
         }
         return Promise.reject(error)
       }
     )
+  }
+
+  onUnauthorized(callback: () => void): void {
+    this.unauthorizedCallback = callback
   }
 
   private getToken(): string | null {
