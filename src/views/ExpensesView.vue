@@ -695,7 +695,23 @@ const closePaymentMethodModal = () => {
   }
 }
 
+const getCurrentMonthDates = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const firstDay = `${year}-${month}-01`
+  const today = `${year}-${month}-${String(now.getDate()).padStart(2, '0')}`
+  return { firstDay, today }
+}
+
+const initFilters = () => {
+  const { firstDay, today } = getCurrentMonthDates()
+  filters.value.date_from = firstDay
+  filters.value.date_to = today
+}
+
 onMounted(() => {
+  initFilters()
   fetchExpenses()
   fetchCategories()
   fetchPaymentMethods()
