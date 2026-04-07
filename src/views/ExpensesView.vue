@@ -100,6 +100,9 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Fecha
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Descripción
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -112,9 +115,6 @@
                 Monto
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Fecha
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Método de Pago
               </th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -124,6 +124,9 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="expense in expenses" :key="expense.id">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatDate(expense.date) }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ expense.description }}
               </td>
@@ -144,9 +147,6 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ formatCurrency(expense.amount) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(expense.date) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ expense.payment_method?.name || 'N/A' }}
@@ -478,12 +478,13 @@ const filters = ref({
 })
 
 const clearFilters = () => {
+  const { firstDay, today } = getCurrentMonthDates()
   filters.value = {
     category_id: '',
     payment_method_id: '',
     tag_id: '',
-    date_from: '',
-    date_to: ''
+    date_from: firstDay,
+    date_to: today
   }
   fetchExpenses()
 }
