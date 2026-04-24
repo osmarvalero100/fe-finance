@@ -39,7 +39,7 @@ Este proyecto utiliza variables de entorno para configurar diferentes aspectos d
 
 | Variable | Descripción | Valor por defecto |
 |----------|-------------|-------------------|
-| `VITE_API_BASE_URL` | URL base de la API | `http://127.0.0.1:8000` |
+| `API_BASE_URL` | URL base de la API | `http://127.0.0.1:8000` |
 | `APP_NAME` | Nombre de la aplicación | `Finance App` |
 | `APP_VERSION` | Versión de la aplicación | `1.0.0` |
 | `VITE_APP_ENV` | Entorno actual | `development` |
@@ -48,22 +48,22 @@ Este proyecto utiliza variables de entorno para configurar diferentes aspectos d
 
 **Desarrollo (`.env`)**:
 ```env
-VITE_API_BASE_URL=http://127.0.0.1:8000
-VITE_APP_NAME=Finance App (Dev)
+API_BASE_URL=http://127.0.0.1:8000
+APP_NAME=Finance App (Dev)
 VITE_APP_ENV=development
 ```
 
 **Staging (`.env.staging`)**:
 ```env
-VITE_API_BASE_URL=https://api-staging.tu-finanzas.com
-VITE_APP_NAME=Finance App (Staging)
+API_BASE_URL=https://api-staging.tu-finanzas.com
+APP_NAME=Finance App (Staging)
 VITE_APP_ENV=staging
 ```
 
 **Producción (`.env.production`)**:
 ```env
-VITE_API_BASE_URL=https://api.tu-finanzas.com
-VITE_APP_NAME=Finance App
+API_BASE_URL=https://api.tu-finanzas.com
+APP_NAME=Finance App
 VITE_APP_ENV=production
 ```
 
@@ -124,7 +124,7 @@ src/
 
 ## API Backend
 
-Esta aplicación frontend está diseñada para trabajar con la API de Finanzas Personales. Asegúrate de que el backend esté ejecutándose y accesible en la URL configurada en `VITE_API_BASE_URL`.
+Esta aplicación frontend está diseñada para trabajar con la API de Finanzas Personales. Asegúrate de que el backend esté ejecutándose y accesible en la URL configurada en `API_BASE_URL`.
 
 ### Endpoints Principales
 
