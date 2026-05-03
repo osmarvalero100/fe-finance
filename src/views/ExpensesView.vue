@@ -103,6 +103,9 @@
                 Fecha
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Monto
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Descripción
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -110,9 +113,6 @@
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Etiquetas
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Monto
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Método de Pago
@@ -126,6 +126,9 @@
             <tr v-for="expense in expenses" :key="expense.id">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(expense.date) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ formatCurrency(expense.amount) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ expense.description }}
@@ -144,9 +147,6 @@
                     {{ tag.icon }} {{ tag.name }}
                   </span>
                 </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatCurrency(expense.amount) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ expense.payment_method?.name || 'N/A' }}
