@@ -245,12 +245,13 @@
               <div class="mt-2 grid grid-cols-2 gap-2">
                 <div v-for="tag in tags" :key="tag.id" class="flex items-center">
                   <input
+                    :id="`tag-${tag.id}`"
                     type="checkbox"
                     :value="tag.id"
                     v-model="expenseForm.tag_ids"
                     class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
-                  <label class="ml-2 block text-sm text-gray-900" :style="{ color: tag.color }">
+                  <label :for="`tag-${tag.id}`" class="ml-2 block text-sm cursor-pointer" :style="{ color: tag.color }">
                     {{ tag.icon }} {{ tag.name }}
                   </label>
                 </div>
