@@ -212,7 +212,7 @@
               >
                 <option value="">Seleccionar categoría</option>
                 <option v-for="category in expenseCategories" :key="category.id" :value="category.id">
-                  {{ category.name }}
+                  {{ category.icon ? category.icon + ' ' : '🧾 ' }}{{ category.name }}
                 </option>
                 <option value="new" class="font-bold text-indigo-600">+ Crear nueva categoría</option>
               </select>
