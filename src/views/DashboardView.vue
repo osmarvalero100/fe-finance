@@ -59,8 +59,49 @@
       </div>
     </div>
 
-    <!-- Recent Transactions -->
-    <div class="bg-white rounded-lg shadow-sm border">
+    <!-- Date Filters for Chart -->
+    <div class="bg-white p-4 rounded-lg shadow-sm border flex items-end gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Fecha desde</label>
+        <input
+          v-model="filters.date_from"
+          @change="fetchChartData"
+          type="date"
+          class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Fecha hasta</label>
+        <input
+          v-model="filters.date_to"
+          @change="fetchChartData"
+          type="date"
+          class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3"
+        />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Chart -->
+      <div class="bg-white rounded-lg shadow-sm border flex flex-col">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Gastos por Categoría</h3>
+        </div>
+        <div class="p-6 flex-grow flex flex-col min-h-[300px]">
+          <div v-if="chartLoading" class="flex-grow flex items-center justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+          <div v-else-if="chartData.datasets[0].data.length === 0" class="flex-grow flex items-center justify-center text-gray-500">
+            No hay gastos en este período
+          </div>
+          <div v-else class="relative flex-grow flex items-center justify-center">
+            <Doughnut :data="chartData" :options="chartOptions" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="bg-white rounded-lg shadow-sm border flex flex-col">
       <div class="px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-medium text-gray-900">Transacciones Recientes</h3>
       </div>
@@ -127,6 +168,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -135,6 +177,10 @@ import { ref, onMounted } from 'vue'
 import apiService from '@/services/api'
 import { formatCurrency } from '@/utils/formatters'
 import type { ExpenseResponse, IncomeResponse } from '@/types/api'
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Doughnut } from 'vue-chartjs'
+
+ChartJS.register(ArcElement, Tooltip, Legend)
 
 interface Transaction {
   id: number
@@ -151,6 +197,80 @@ const balance = ref(0)
 const activeBudgets = ref(0)
 const recentTransactions = ref<Transaction[]>([])
 const loading = ref(true)
+
+const filters = ref({
+  date_from: '',
+  date_to: ''
+})
+
+const chartLoading = ref(false)
+
+const chartData = ref({
+  labels: [] as string[],
+  datasets: [{
+    data: [] as number[],
+    backgroundColor: [] as string[]
+  }]
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom' as const
+    }
+  }
+}
+
+const getCurrentMonthDates = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const firstDay = `${year}-${month}-01`
+  const lastDay = new Date(year, now.getMonth() + 1, 0).getDate()
+  const lastDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`
+  return { firstDay, lastDate }
+}
+
+const fetchChartData = async () => {
+  try {
+    chartLoading.value = true
+    const params: any = {}
+    if (filters.value.date_from) params.start_date = `${filters.value.date_from}T00:00:00`
+    if (filters.value.date_to) params.end_date = `${filters.value.date_to}T23:59:59`
+
+    const response = await apiService.instance.get('/expenses/filter', { params })
+    const expenses: ExpenseResponse[] = response.data
+
+    const categoryTotals: Record<string, { total: number, color: string }> = {}
+    
+    expenses.forEach(expense => {
+      const catName = expense.category?.name || 'Sin categoría'
+      const color = expense.category?.color || '#cbd5e1'
+      if (!categoryTotals[catName]) {
+        categoryTotals[catName] = { total: 0, color }
+      }
+      categoryTotals[catName].total += Number(expense.amount)
+    })
+
+    const labels = Object.keys(categoryTotals)
+    const data = labels.map(label => categoryTotals[label].total)
+    const colors = labels.map(label => categoryTotals[label].color)
+
+    chartData.value = {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors
+      }]
+    }
+  } catch (error) {
+    console.error('Error fetching chart data:', error)
+  } finally {
+    chartLoading.value = false
+  }
+}
 
 const fetchDashboardData = async () => {
   try {
@@ -182,6 +302,11 @@ const formatDate = (dateString: string) => {
 }
 
 onMounted(() => {
+  const dates = getCurrentMonthDates()
+  filters.value.date_from = dates.firstDay
+  filters.value.date_to = dates.lastDate
+
   fetchDashboardData()
+  fetchChartData()
 })
 </script>
