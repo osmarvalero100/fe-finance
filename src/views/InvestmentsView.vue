@@ -110,19 +110,19 @@
               <!-- Type -->
               <div>
                 <label class="block text-sm font-medium text-gray-700">Tipo *</label>
-                <select
+                <SearchableSelect
                   v-model="investmentForm.investment_type"
+                  :options="[
+                    { id: 'Acciones', name: 'Acciones' },
+                    { id: 'Bonos', name: 'Bonos' },
+                    { id: 'Criptomonedas', name: 'Criptomonedas' },
+                    { id: 'Bienes Raíces', name: 'Bienes Raíces' },
+                    { id: 'Fondos Mutuos', name: 'Fondos Mutuos' },
+                    { id: 'ETF', name: 'ETF' },
+                    { id: 'Otro', name: 'Otro' }
+                  ]"
                   required
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="Acciones">Acciones</option>
-                  <option value="Bonos">Bonos</option>
-                  <option value="Criptomonedas">Criptomonedas</option>
-                  <option value="Bienes Raíces">Bienes Raíces</option>
-                  <option value="Fondos Mutuos">Fondos Mutuos</option>
-                  <option value="ETF">ETF</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                />
               </div>
 
               <!-- Amount Invested -->
@@ -231,6 +231,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { useInvestmentsStore } from '@/stores/investments'
 import { formatCurrency } from '@/utils/formatters'
 import type { InvestmentResponse, InvestmentCreate } from '@/types/api'

@@ -134,18 +134,18 @@
               <!-- Type -->
               <div>
                 <label class="block text-sm font-medium text-gray-700">Tipo de Deuda *</label>
-                <select
+                <SearchableSelect
                   v-model="debtForm.debt_type"
+                  :options="[
+                    { id: 'Hipoteca', name: 'Hipoteca' },
+                    { id: 'Préstamo Vehicular', name: 'Préstamo Vehicular' },
+                    { id: 'Préstamo Personal', name: 'Préstamo Personal' },
+                    { id: 'Préstamo Estudiantil', name: 'Préstamo Estudiantil' },
+                    { id: 'Tarjeta de Crédito', name: 'Tarjeta de Crédito' },
+                    { id: 'Otro', name: 'Otro' }
+                  ]"
                   required
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="Hipoteca">Hipoteca</option>
-                  <option value="Préstamo Vehicular">Préstamo Vehicular</option>
-                  <option value="Préstamo Personal">Préstamo Personal</option>
-                  <option value="Préstamo Estudiantil">Préstamo Estudiantil</option>
-                  <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                />
               </div>
 
               <!-- Original Amount -->
@@ -258,6 +258,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { useDebtsStore } from '@/stores/debts'
 import { formatCurrency } from '@/utils/formatters'
 import type { DebtResponse, DebtCreate } from '@/types/api'

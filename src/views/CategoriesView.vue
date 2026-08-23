@@ -106,14 +106,13 @@
                <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label for="type" class="block text-sm font-medium text-gray-700">Tipo</label>
-                  <select 
+                  <SearchableSelect
                     v-model="form.category_type"
-                    id="type"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
-                    <option value="expense">Gasto</option>
-                    <option value="income">Ingreso</option>
-                  </select>
+                    :options="[
+                      { id: 'expense', name: 'Gasto' },
+                      { id: 'income', name: 'Ingreso' }
+                    ]"
+                  />
                 </div>
                 
                 <div>
@@ -168,6 +167,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import { useCategoriesStore } from '../stores/categories'
 import type { CategoryResponse } from '../types/api'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 
 const store = useCategoriesStore()
 

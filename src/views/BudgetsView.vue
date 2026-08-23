@@ -171,16 +171,15 @@
                 <div v-for="(item, index) in budgetForm.budget_items" :key="index" class="flex gap-3 items-end">
                   <div class="flex-grow">
                     <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
-                    <select
+                    <SearchableSelect
                       v-model="item.category_id"
+                      :options="expenseCategories"
                       required
-                      class="block w-full px-2 py-1.5 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    >
-                      <option value="0" disabled>Seleccionar</option>
-                      <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">
-                        {{ cat.name }}
-                      </option>
-                    </select>
+                      :show-default-option="true"
+                      default-option-label="Seleccionar"
+                      placeholder="Seleccionar"
+                      button-class="!py-1.5"
+                    />
                   </div>
                   <div class="w-32">
                     <label class="block text-xs font-medium text-gray-500 mb-1">Monto</label>
@@ -237,6 +236,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { storeToRefs } from 'pinia'
 import { useBudgetsStore } from '@/stores/budgets'
 import { useCategoriesStore } from '@/stores/categories'

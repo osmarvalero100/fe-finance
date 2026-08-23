@@ -32,42 +32,36 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
         <div>
           <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Categoría</label>
-          <select
+          <SearchableSelect
             v-model="filters.category_id"
+            :options="categories"
             @change="fetchExpenses"
-            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
-          >
-            <option value="">Todas las categorías</option>
-            <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ category.name }}
-            </option>
-          </select>
+            :show-default-option="true"
+            default-option-label="Todas las categorías"
+            placeholder="Todas las categorías"
+          />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Método de Pago</label>
-          <select
+          <SearchableSelect
             v-model="filters.payment_method_id"
+            :options="paymentMethods"
             @change="fetchExpenses"
-            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
-          >
-            <option value="">Todos los métodos</option>
-            <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
-              {{ method.name }}
-            </option>
-          </select>
+            :show-default-option="true"
+            default-option-label="Todos los métodos"
+            placeholder="Todos los métodos"
+          />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Etiqueta</label>
-          <select
+          <SearchableSelect
             v-model="filters.tag_id"
+            :options="tags"
             @change="fetchExpenses"
-            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2"
-          >
-            <option value="">Todas las etiquetas</option>
-            <option v-for="tag in tags" :key="tag.id" :value="tag.id">
-              {{ tag.icon }} {{ tag.name }}
-            </option>
-          </select>
+            :show-default-option="true"
+            default-option-label="Todas las etiquetas"
+            placeholder="Todas las etiquetas"
+          />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 font-semibold mb-1">Fecha desde</label>
@@ -215,18 +209,21 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Categoría</label>
-              <select
+              <SearchableSelect
                 v-model="expenseForm.category_id"
+                :options="expenseCategories"
                 @change="watchCategorySelection"
                 required
-                class="mt-1 block w-full px-4 py-3 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:shadow-md"
+                :show-default-option="true"
+                default-option-label="Seleccionar categoría"
+                placeholder="Seleccionar categoría"
+                :action-option="{ value: 'new', label: '+ Crear nueva categoría' }"
+                button-class="!py-3"
               >
-                <option value="">Seleccionar categoría</option>
-                <option v-for="category in expenseCategories" :key="category.id" :value="category.id">
-                  {{ category.icon ? category.icon + ' ' : '🧾 ' }}{{ category.name }}
-                </option>
-                <option value="new" class="font-bold text-indigo-600">+ Crear nueva categoría</option>
-              </select>
+                <template #option="{ option }">
+                  {{ option.icon ? option.icon + ' ' : '🧾 ' }}{{ option.name }}
+                </template>
+              </SearchableSelect>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Fecha</label>
@@ -239,17 +236,16 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Método de Pago</label>
-              <select
+              <SearchableSelect
                 v-model="expenseForm.payment_method_id"
+                :options="paymentMethods"
                 @change="watchPaymentMethodSelection"
-                class="mt-1 block w-full px-4 py-3 shadow-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:shadow-md"
-              >
-                <option value="">Seleccionar método</option>
-                <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
-                  {{ method.name }}
-                </option>
-                <option value="new" class="font-bold text-indigo-600">+ Crear nuevo método</option>
-              </select>
+                :show-default-option="true"
+                default-option-label="Seleccionar método"
+                placeholder="Seleccionar método"
+                :action-option="{ value: 'new', label: '+ Crear nuevo método' }"
+                button-class="!py-3"
+              />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Etiquetas</label>
@@ -369,18 +365,18 @@
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Tipo *</label>
-                <select 
+                <SearchableSelect
                   v-model="paymentMethodForm.payment_type"
+                  :options="[
+                    { id: 'Cash', name: 'Efectivo' },
+                    { id: 'Debit Card', name: 'Tarjeta de Débito' },
+                    { id: 'Credit Card', name: 'Tarjeta de Crédito' },
+                    { id: 'Bank Account', name: 'Cuenta Bancaria' },
+                    { id: 'Digital Wallet', name: 'Billetera Digital' },
+                    { id: 'Other', name: 'Otro' }
+                  ]"
                   required
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="Cash">Efectivo</option>
-                  <option value="Debit Card">Tarjeta de Débito</option>
-                  <option value="Credit Card">Tarjeta de Crédito</option>
-                  <option value="Bank Account">Cuenta Bancaria</option>
-                  <option value="Digital Wallet">Billetera Digital</option>
-                  <option value="Other">Otro</option>
-                </select>
+                />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Institución</label>
@@ -446,6 +442,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import apiService from '@/services/api'
 import { formatCurrency } from '@/utils/formatters'
 import type { ExpenseResponse, ExpenseCreate, ExpenseUpdate, CategoryResponse, PaymentMethodResponse, TagResponse } from '@/types/api'

@@ -123,20 +123,20 @@
               <!-- Type -->
               <div>
                 <label class="block text-sm font-medium text-gray-700">Tipo de Producto *</label>
-                <select
+                <SearchableSelect
                   v-model="productForm.product_type"
+                  :options="[
+                    { id: 'Ahorros', name: 'Cuenta de Ahorros' },
+                    { id: 'Corriente', name: 'Cuenta Corriente' },
+                    { id: 'Tarjeta de Crédito', name: 'Tarjeta de Crédito' },
+                    { id: 'Préstamo', name: 'Préstamo' },
+                    { id: 'CDT', name: 'CDT / Depósito a Plazo' },
+                    { id: 'Inversión', name: 'Cuenta de Inversión' },
+                    { id: 'Seguro', name: 'Seguro' },
+                    { id: 'Otro', name: 'Otro' }
+                  ]"
                   required
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="Ahorros">Cuenta de Ahorros</option>
-                  <option value="Corriente">Cuenta Corriente</option>
-                  <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                  <option value="Préstamo">Préstamo</option>
-                  <option value="CDT">CDT / Depósito a Plazo</option>
-                  <option value="Inversión">Cuenta de Inversión</option>
-                  <option value="Seguro">Seguro</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                />
               </div>
 
               <!-- Account Number -->
@@ -232,6 +232,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { useFinancialProductsStore } from '@/stores/financialProducts'
 import { formatCurrency } from '@/utils/formatters'
 import type { FinancialProductResponse, FinancialProductCreate } from '@/types/api'

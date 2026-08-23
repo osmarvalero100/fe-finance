@@ -99,18 +99,17 @@
                <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label for="payment_type" class="block text-sm font-medium text-gray-700">Tipo</label>
-                    <select 
+                    <SearchableSelect
                       v-model="form.payment_type"
-                      id="payment_type"
-                      class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    >
-                      <option value="Cash">Efectivo</option>
-                      <option value="Debit Card">Tarjeta de Débito</option>
-                      <option value="Credit Card">Tarjeta de Crédito</option>
-                      <option value="Bank Account">Cuenta Bancaria</option>
-                      <option value="Digital Wallet">Billetera Digital</option>
-                      <option value="Other">Otro</option>
-                    </select>
+                      :options="[
+                        { id: 'Cash', name: 'Efectivo' },
+                        { id: 'Debit Card', name: 'Tarjeta de Débito' },
+                        { id: 'Credit Card', name: 'Tarjeta de Crédito' },
+                        { id: 'Bank Account', name: 'Cuenta Bancaria' },
+                        { id: 'Digital Wallet', name: 'Billetera Digital' },
+                        { id: 'Other', name: 'Otro' }
+                      ]"
+                    />
                   </div>
                   
                   <div>
@@ -190,6 +189,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import { usePaymentMethodsStore } from '../stores/paymentMethods'
 import type { PaymentMethodResponse } from '../types/api'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 
 const store = usePaymentMethodsStore()
 
