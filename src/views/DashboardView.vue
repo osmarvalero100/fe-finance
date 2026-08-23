@@ -241,23 +241,12 @@ const fetchChartData = async () => {
     if (filters.value.date_from) params.start_date = `${filters.value.date_from}T00:00:00`
     if (filters.value.date_to) params.end_date = `${filters.value.date_to}T23:59:59`
 
-    const response = await apiService.instance.get('/expenses/filter', { params })
-    const expenses: ExpenseResponse[] = response.data
+    const response = await apiService.instance.get('/expenses/summary/category', { params })
+    const summaryData: any[] = response.data
 
-    const categoryTotals: Record<string, { total: number, color: string }> = {}
-    
-    expenses.forEach(expense => {
-      const catName = expense.category?.name || 'Sin categoría'
-      const color = expense.category?.color || '#cbd5e1'
-      if (!categoryTotals[catName]) {
-        categoryTotals[catName] = { total: 0, color }
-      }
-      categoryTotals[catName].total += Number(expense.amount)
-    })
-
-    const labels = Object.keys(categoryTotals)
-    const data = labels.map(label => categoryTotals[label].total)
-    const colors = labels.map(label => categoryTotals[label].color)
+    const labels = summaryData.map(item => item.category_name)
+    const data = summaryData.map(item => item.total_amount)
+    const colors = summaryData.map(item => item.color || '#cbd5e1')
 
     chartData.value = {
       labels,
