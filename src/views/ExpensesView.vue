@@ -8,12 +8,23 @@
           <span class="text-sm font-semibold text-indigo-700">Total: {{ formatCurrency(totalExpenses) }}</span>
         </div>
       </div>
-      <button
-        @click="showAddModal = true"
-        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        Agregar Gasto
-      </button>
+      <div class="flex gap-2">
+        <button
+          @click="exportToCSV"
+          class="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 flex items-center gap-2 transition-colors shadow-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Exportar CSV
+        </button>
+        <button
+          @click="showAddModal = true"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-colors"
+        >
+          Agregar Gasto
+        </button>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -518,6 +529,36 @@ const watchPaymentMethodSelection = () => {
     expenseForm.value.payment_method_id = undefined
     showPaymentMethodModal.value = true
   }
+}
+
+const exportToCSV = () => {
+  if (expenses.value.length === 0) {
+    alert('No hay gastos para exportar con los filtros actuales.')
+    return
+  }
+
+  const headers = ['Fecha', 'Monto', 'Descripción', 'Categoría', 'Etiquetas', 'Método de Pago']
+  const rows = expenses.value.map(expense => {
+    const date = formatDate(expense.date)
+    const amount = expense.amount
+    const desc = `"${(expense.description || '').replace(/"/g, '""')}"`
+    const cat = `"${(expense.category?.name || 'Sin categoría').replace(/"/g, '""')}"`
+    const tagsStr = `"${(expense.tags?.map(t => t.name).join(', ') || '').replace(/"/g, '""')}"`
+    const method = `"${(expense.payment_method?.name || 'N/A').replace(/"/g, '""')}"`
+    return [date, amount, desc, cat, tagsStr, method].join(',')
+  })
+
+  const csvContent = [headers.join(','), ...rows].join('\n')
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  
+  const fileName = `gastos_${filters.value.date_from || 'inicio'}_al_${filters.value.date_to || 'fin'}.csv`
+  link.setAttribute('download', fileName)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 const fetchExpenses = async () => {
