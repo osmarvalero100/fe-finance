@@ -95,7 +95,7 @@
             No hay gastos en este período
           </div>
           <div v-else class="relative flex-grow flex items-center justify-center">
-            <Doughnut :data="chartData" :options="chartOptions" />
+            <Doughnut :key="chartKey" :data="chartData" :options="chartOptions" />
           </div>
         </div>
       </div>
@@ -204,6 +204,7 @@ const filters = ref({
 })
 
 const chartLoading = ref(false)
+const chartKey = ref(0)
 
 const chartData = ref({
   labels: [] as string[],
@@ -265,6 +266,7 @@ const fetchChartData = async () => {
         backgroundColor: colors
       }]
     }
+    chartKey.value++
   } catch (error) {
     console.error('Error fetching chart data:', error)
   } finally {
