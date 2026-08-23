@@ -529,34 +529,49 @@ const watchPaymentMethodSelection = () => {
   }
 }
 
-const exportToCSV = () => {
-  if (expenses.value.length === 0) {
-    alert('No hay gastos para exportar con los filtros actuales.')
-    return
+const exportToCSV = async () => {
+  try {
+    const params: any = { limit: 1000000 } // Limite alto para exportar todos los datos
+    if (filters.value.category_id) params.category_id = filters.value.category_id
+    if (filters.value.payment_method_id) params.payment_method_id = filters.value.payment_method_id
+    if (filters.value.tag_id) params.tag_ids = filters.value.tag_id
+    if (filters.value.date_from) params.start_date = `${filters.value.date_from}T00:00:00`
+    if (filters.value.date_to) params.end_date = `${filters.value.date_to}T23:59:59`
+
+    const response = await apiService.instance.get('/expenses/filter', { params })
+    const expensesToExport: ExpenseResponse[] = response.data
+
+    if (expensesToExport.length === 0) {
+      alert('No hay gastos para exportar con los filtros actuales.')
+      return
+    }
+
+    const headers = ['Fecha', 'Monto', 'Descripción', 'Categoría', 'Etiquetas', 'Método de Pago']
+    const rows = expensesToExport.map(expense => {
+      const date = formatDate(expense.date)
+      const amount = expense.amount
+      const desc = `"${(expense.description || '').replace(/"/g, '""')}"`
+      const cat = `"${(expense.category?.name || 'Sin categoría').replace(/"/g, '""')}"`
+      const tagsStr = `"${(expense.tags?.map(t => t.name).join(', ') || '').replace(/"/g, '""')}"`
+      const method = `"${(expense.payment_method?.name || 'N/A').replace(/"/g, '""')}"`
+      return [date, amount, desc, cat, tagsStr, method].join(',')
+    })
+
+    const csvContent = [headers.join(','), ...rows].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    
+    const fileName = `gastos_${filters.value.date_from || 'inicio'}_al_${filters.value.date_to || 'fin'}.csv`
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Error al exportar gastos:', error)
+    alert('Hubo un error al exportar los datos.')
   }
-
-  const headers = ['Fecha', 'Monto', 'Descripción', 'Categoría', 'Etiquetas', 'Método de Pago']
-  const rows = expenses.value.map(expense => {
-    const date = formatDate(expense.date)
-    const amount = expense.amount
-    const desc = `"${(expense.description || '').replace(/"/g, '""')}"`
-    const cat = `"${(expense.category?.name || 'Sin categoría').replace(/"/g, '""')}"`
-    const tagsStr = `"${(expense.tags?.map(t => t.name).join(', ') || '').replace(/"/g, '""')}"`
-    const method = `"${(expense.payment_method?.name || 'N/A').replace(/"/g, '""')}"`
-    return [date, amount, desc, cat, tagsStr, method].join(',')
-  })
-
-  const csvContent = [headers.join(','), ...rows].join('\n')
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.setAttribute('href', url)
-  
-  const fileName = `gastos_${filters.value.date_from || 'inicio'}_al_${filters.value.date_to || 'fin'}.csv`
-  link.setAttribute('download', fileName)
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 const fetchExpenses = async () => {
