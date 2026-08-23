@@ -1,26 +1,27 @@
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex justify-between items-center">
-      <div class="flex items-center gap-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
         <h3 class="text-lg font-medium text-gray-900">Gastos</h3>
-        <div v-if="!loading" class="bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+        <div v-if="!loading" class="bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 shrink-0">
           <span class="text-sm font-semibold text-indigo-700">Total: {{ formatCurrency(totalExpenses) }}</span>
         </div>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2 w-full sm:w-auto">
         <button
           @click="exportToCSV"
-          class="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 flex items-center gap-2 transition-colors shadow-sm"
+          class="flex-1 sm:flex-none justify-center bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 flex items-center gap-2 transition-colors shadow-sm text-sm whitespace-nowrap"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          Exportar CSV
+          <span class="hidden sm:inline">Exportar CSV</span>
+          <span class="inline sm:hidden">CSV</span>
         </button>
         <button
           @click="showAddModal = true"
-          class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-colors"
+          class="flex-1 sm:flex-none justify-center bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-colors flex items-center text-sm whitespace-nowrap"
         >
           Agregar Gasto
         </button>
